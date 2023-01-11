@@ -2,6 +2,8 @@ import { FormRow, Logo, Alert } from '../components'
 import { useState, useEffect } from 'react'
 import Wrapper from '../assets/wrappers/RegisterPage'
 import { useAppContext } from '../context/appContext'
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom';
 
 const initialState = {
     name: '',
@@ -11,20 +13,21 @@ const initialState = {
 }
 const Register = () => {
     const [values, setValues] = useState(initialState)
-    //globalState & useNavigate
-    let { showAlert, isLoading, displayAlert, clearAlert } = useAppContext();
+    const navigate=useNavigate()
+    let { user, showAlert, isLoading, displayAlert, clearAlert, registerUser } = useAppContext();
+
+
 
 
     //toggle member
     const toggleMember = () => {
         setValues({ ...initialState, isMember: !values.isMember })
-        clearAlert();
-        console.log(values)
+        return clearAlert();
+        
     }
 
     const handleChange = (e) => {
         setValues({ ...values, [e.target.name]: e.target.value })
-        console.log(e.target.value)
     }
 
     const onSubmit = (e) => {
@@ -32,13 +35,23 @@ const Register = () => {
         let { name, email,
             password, isMember }=values;
         if(!email || !password || (!isMember && !name)){
-            displayAlert()
+            return displayAlert()    
         }
-        else{
-            console.log(values)
-        }
+        
+        const currentUser={name,email,password}
+
+        if(isMember) console.log('already a member')
+        else registerUser(currentUser)
 
     }
+
+    useEffect(()=>{
+        if(user){
+            setTimeout(() => {
+                navigate('/')  
+            }, 3000);   
+        }
+    },[user, navigate])
     return (
         <Wrapper className='full-page'>
             <form className='form' onSubmit={onSubmit}>
@@ -59,7 +72,7 @@ const Register = () => {
 
                 {/* password */}
                 <FormRow type='password' name='password' value={values.password} handleChange={handleChange} />
-                <button className='btn btn-block'>
+                <button className='btn btn-block' disabled={isLoading}>
                     Submit
                 </button>
                 <p>

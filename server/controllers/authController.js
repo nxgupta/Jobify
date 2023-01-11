@@ -17,7 +17,7 @@ const register = async (req, res, next) => {
 
         const token=user.createJWT()
 
-        res.status(StatusCodes.CREATED).json({user:{name:user.name,email:user.email,lastname:user.lastname,location:user.location},token})
+        res.status(StatusCodes.CREATED).json({user:{name:user.name,email:user.email,location:user.location},token,location:user.location})
     }
     catch (err) {
         next(err)
