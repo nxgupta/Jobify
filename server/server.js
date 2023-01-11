@@ -4,6 +4,8 @@ const app=express()
 import dotenv from 'dotenv'
 dotenv.config()
 
+import cors from 'cors'
+
 //import "express-async-errors"
 import {StatusCodes} from "http-status-codes"
 
@@ -18,6 +20,9 @@ import {notFoundMiddleware,errorHandlerMiddleware} from './middleware/index.js';
 
 //configuring port
 const port=process.env.PORT || 5000;
+
+//CORS
+app.use(cors())
 
 //body in json
 app.use(express.json())

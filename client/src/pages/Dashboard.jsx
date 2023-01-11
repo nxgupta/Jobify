@@ -1,7 +1,8 @@
+import axios from 'axios'
 const Dashboard = () => {
   return (
     <div>
-      Dashboard
+      Dashboard   
     </div>
   )
 }
