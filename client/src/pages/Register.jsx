@@ -13,17 +13,14 @@ const initialState = {
 }
 const Register = () => {
     const [values, setValues] = useState(initialState)
-    const navigate=useNavigate()
-    let { user, showAlert, isLoading, displayAlert, clearAlert, registerUser } = useAppContext();
-
-
-
+    const navigate = useNavigate()
+    let { user, showAlert, isLoading, displayAlert, clearAlert, registerUser,loginUser } = useAppContext();
 
     //toggle member
     const toggleMember = () => {
         setValues({ ...initialState, isMember: !values.isMember })
         return clearAlert();
-        
+
     }
 
     const handleChange = (e) => {
@@ -33,25 +30,25 @@ const Register = () => {
     const onSubmit = (e) => {
         e.preventDefault()
         let { name, email,
-            password, isMember }=values;
-        if(!email || !password || (!isMember && !name)){
-            return displayAlert()    
+            password, isMember } = values;
+        if (!email || !password || (!isMember && !name)) {
+            return displayAlert()
         }
-        
-        const currentUser={name,email,password}
 
-        if(isMember) console.log('already a member')
+        const currentUser = { name, email, password }
+
+        if (isMember) loginUser(currentUser)
         else registerUser(currentUser)
 
     }
 
-    useEffect(()=>{
-        if(user){
+    useEffect(() => {
+        if (user) {
             setTimeout(() => {
-                navigate('/')  
-            }, 3000);   
+                navigate('/')
+            }, 3000);
         }
-    },[user, navigate])
+    }, [user, navigate])
     return (
         <Wrapper className='full-page'>
             <form className='form' onSubmit={onSubmit}>
