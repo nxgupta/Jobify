@@ -1,14 +1,22 @@
+//express
 import express from 'express'
 const app=express()
 
+//dotenv
 import dotenv from 'dotenv'
 dotenv.config()
 
+//morgon
+import morgan from 'morgan'
+if(process.env.NODE_ENV!=='production'){
+    app.use(morgan('dev'))
+}
+
+//cors
 import cors from 'cors'
+app.use(cors())
 
-//import "express-async-errors"
-import {StatusCodes} from "http-status-codes"
-
+//routes
 import authRouter from './routes/authRoutes.js'
 import jobsRouter from './routes/jobsRoutes.js'
 
@@ -21,9 +29,6 @@ import {notFoundMiddleware,errorHandlerMiddleware} from './middleware/index.js';
 //configuring port
 const port=process.env.PORT || 5000;
 
-//CORS
-app.use(cors())
-
 //body in json
 app.use(express.json())
 
@@ -35,14 +40,11 @@ app.get('/',(req,res)=>{
 app.use('/api/v1/auth',authRouter)
 app.use('/api/v1/jobs',jobsRouter)
 
-
-
 //handling route errors
 app.use(notFoundMiddleware)
 
 //handling errors caused by the missing resources/server error
 app.use(errorHandlerMiddleware)
-
 let start=async ()=>{
     try{
         await connectDB(process.env.MONGO_URL)
