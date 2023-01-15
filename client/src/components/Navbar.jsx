@@ -18,7 +18,7 @@ const [showLogout,setShowLogout]=useState(false)
 
         <div>
             <Logo/>
-            <div className="logo-text">dashboard</div>
+            <h3 className="logo-text">dashboard</h3>
         </div>
 
         <div className="btn-container">
