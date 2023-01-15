@@ -1,6 +1,6 @@
 const Stats = () => {
   return (
-    <div>Stats</div>
+    <h3>Stats pages</h3>
   )
 }
 export default Stats
