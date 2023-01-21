@@ -37,8 +37,11 @@ app.get('/',(req,res)=>{
     res.send('welcome!')
 })
 
+//in order to authenticate user, for jobs
+import authenticateUser from './middleware/Auth.js'
+
 app.use('/api/v1/auth',authRouter)
-app.use('/api/v1/jobs',jobsRouter)
+app.use('/api/v1/jobs',authenticateUser, jobsRouter)
 
 //handling route errors
 app.use(notFoundMiddleware)
