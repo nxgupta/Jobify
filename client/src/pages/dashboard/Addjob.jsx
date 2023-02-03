@@ -1,6 +1,6 @@
 const Addjob = () => {
   return (
-    <div>Addjob</div>
+    <h3>Addjob</h3>
   )
 }
 export default Addjob
