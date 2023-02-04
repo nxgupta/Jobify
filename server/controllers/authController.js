@@ -19,7 +19,7 @@ const register = async (req, res, next) => {
 
         const token=user.createJWT()
 
-        res.status(StatusCodes.CREATED).json({user:{name:user.name,email:user.email,location:user.location},token,location:user.location})
+        res.status(StatusCodes.CREATED).json({user:{name:user.name,email:user.email,lastName:user.lastName,location:user.location},token,location:user.location})
     }
     catch (err) {
         next(err)
@@ -32,7 +32,6 @@ const login = async (req, res,next) => {
     if(!email || !password){
         throw new badRequestError('Please provide all values')
     }
-
     //we need to exclusively include select for password
     const user=await User.findOne({email}).select('+password')
 
@@ -58,7 +57,7 @@ const updateUser = async (req, res) => {
     if(!email || !name || !lastName || !location){
         throw new badRequestError('Please provide all values')
     }
-
+    
     const user=await User.findOne({_id:req.user.userId});
 
     user.email=email

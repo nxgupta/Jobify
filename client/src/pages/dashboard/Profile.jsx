@@ -4,7 +4,6 @@ import { useAppContext } from "../../context/appContext"
 import Wrapper from "../../assets/wrappers/DashboardFormPage"
 const Profile = () => {
   const { user, showAlert, displayAlert, updateUser, isLoading } = useAppContext();
-  console.log(user)
   let [name, setName] = useState(user?.name)
   let [email, setEmail] = useState(user?.email)
   let [lastName, setLastName] = useState(user?.lastName)
@@ -12,12 +11,11 @@ const Profile = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault()
-
     //disable while testing
-    // if(!name || !email || !lastName || !location){
-    //   displayAlert()
-    //   return
-    // }
+    if(!name || !email || !lastName || !location){
+      displayAlert()
+      return
+    }
     updateUser({name,email,lastName,location})
   }
   return (
