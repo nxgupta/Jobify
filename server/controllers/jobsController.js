@@ -1,5 +1,13 @@
+import Job from '../model/Job.js'
+import {StatusCodes} from 'http-status-codes'
+import {badRequestError, notFoundError} from '../errors/index.js'
+
+
 const createJob=async (req,res)=>{
-    res.send('create job')
+    const {position,company}=req.body;
+    if(!position || !company){
+        throw new badRequestError('')
+    }
 }
 const deleteJob=async (req,res)=>{
     res.send('delete job')
