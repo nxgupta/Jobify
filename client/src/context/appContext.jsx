@@ -1,7 +1,8 @@
 import { useReducer, useContext, createContext } from 'react'
 import {
     DISPLAY_ALERT, CLEAR_ALERT, REGISTER_USER_BEGIN, REGISTER_USER_SUCCESS, REGISTER_USER_ERROR,
-    LOGIN_USER_BEGIN, LOGIN_USER_SUCCESS, LOGIN_USER_ERROR, UPDATE_USER_BEGIN, UPDATE_USER_SUCCESS, UPDATE_USER_ERROR, TOGGLE_SIDEBAR, LOGOUT_USER,
+    LOGIN_USER_BEGIN, LOGIN_USER_SUCCESS, LOGIN_USER_ERROR, UPDATE_USER_BEGIN, UPDATE_USER_SUCCESS, UPDATE_USER_ERROR,
+    CREATE_JOB_BEGIN, CREATE_JOB_SUCCESS, CREATE_JOB_ERROR, TOGGLE_SIDEBAR, LOGOUT_USER, HANDLE_CHANGE, CLEAR_VALUES
 } from './actions';
 import reducer from './reducer';
 import { endPoint } from '../App';
@@ -21,7 +22,15 @@ const initialState = {
     token: token ?? null,
     userLocation: userLocation ?? '',
     jobLocation: userLocation ?? '',
-    showSidebar: false
+    showSidebar: false,
+    isEditing: false,
+    editJobId: '',
+    position: '',
+    company: '',
+    jobTypeOptions: ['full-time', 'part-time', 'remote', 'internship'],
+    jobType: 'full-time',
+    statusOptions: ['interview', 'declined', 'pending'],
+    status: 'pending'
 }
 
 const AppContext = createContext();
@@ -112,14 +121,6 @@ const AppProvider = ({ children }) => {
         clearAlert()
     }
 
-    const toggleSidebar = () => {
-        dispatch({ type: TOGGLE_SIDEBAR })
-    }
-
-    const logoutUser = () => {
-        dispatch({ type: LOGOUT_USER })
-        removeUserFromLocalStorage()
-    }
 
     const updateUser = async (currentUser) => {
         dispatch({ type: UPDATE_USER_BEGIN })
@@ -135,17 +136,75 @@ const AppProvider = ({ children }) => {
             const { data } = await authFetch.patch('/auth/updateUser', currentUser)
             const { user, location, token } = data;
             dispatch({ type: UPDATE_USER_SUCCESS, payload: { user, location, token } })
-            addUserToLocalStorage({user,location,token});    
+            addUserToLocalStorage({ user, location, token });
 
         }
         catch (error) {
-            if(error.response.data.status!==401)
-                dispatch({type:UPDATE_USER_ERROR,payload:{msg:error.response.data.msg}})
+            if (error.response.data.status !== 401)
+                dispatch({ type: UPDATE_USER_ERROR, payload: { msg: error.response.data.msg } })
         }
         clearAlert()
     }
 
-    return <AppContext.Provider value={{ ...state, displayAlert, clearAlert, registerUser, loginUser, toggleSidebar, logoutUser, updateUser }}>
+    const createJob = async () => {
+        dispatch({ type: CREATE_JOB_BEGIN })
+        try {
+            const {
+                position,
+                company,
+                jobLocation,
+                jobType,
+                status,
+            } = state
+            
+            await authFetch.post('/jobs',{
+                position,
+                company,
+                jobLocation,
+                jobType,
+                status,
+            })
+            dispatch({
+                type: CREATE_JOB_SUCCESS,
+            })
+            dispatch({
+                type: CLEAR_VALUES
+            })
+        }
+        catch (error) {
+            dispatch({
+                type: CREATE_JOB_ERROR,
+                payload: {
+                    msg: error.response.data.msg
+                }
+            })
+        }
+        clearAlert();
+    }
+    const handleChange = ({ name, value }) => {
+        dispatch({
+            type: HANDLE_CHANGE,
+            payload: {
+                name, value
+            }
+        })
+    }
+
+    const clearValues = () => {
+        dispatch({
+            type: CLEAR_VALUES,
+        })
+    }
+    const toggleSidebar = () => {
+        dispatch({ type: TOGGLE_SIDEBAR })
+    }
+
+    const logoutUser = () => {
+        dispatch({ type: LOGOUT_USER })
+        removeUserFromLocalStorage()
+    }
+
+    return <AppContext.Provider value={{ ...state, displayAlert, clearAlert, registerUser, loginUser, toggleSidebar, logoutUser, handleChange, updateUser, clearValues,createJob }}>
         {children}
     </AppContext.Provider>
 }

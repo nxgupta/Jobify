@@ -1,6 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import { badRequestError, unAuthenticatedError } from "../errors/index.js";
 import User from "../model/User.js"
+import { catchAsync } from "../utils/catchAsync.js";
 
 
 const register = async (req, res, next) => {
@@ -52,7 +53,7 @@ catch(err){
 }
 
 }
-const updateUser = async (req, res) => {
+const updateUser = catchAsync(async (req, res) => {
     const {email,name,lastName,location}=req.body
     if(!email || !name || !lastName || !location){
         throw new badRequestError('Please provide all values')
@@ -70,6 +71,6 @@ const updateUser = async (req, res) => {
     const token=user.createJWT();
 
     res.status(StatusCodes.OK).json({user, token, location:user.location})
-}
+})
 
 export { register, login, updateUser }
