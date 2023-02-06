@@ -1,5 +1,6 @@
 import Wrapper from "../../assets/wrappers/DashboardFormPage"
 import { FormRow, Alert, FormRowSelect } from "../../components"
+import { SET_EDIT_JOB } from "../../context/actions"
 import { useAppContext } from "../../context/appContext"
 
 const Addjob = () => {
@@ -18,7 +19,8 @@ const Addjob = () => {
     position,
     handleChange,
     clearValues,
-    createJob
+    createJob,
+    editJob
   } = useAppContext()
 
   const handleSubmit = (e) => {
@@ -29,7 +31,8 @@ const Addjob = () => {
     }
 
     if(isEditing){
-      return
+      editJob()
+      return;
     }
     createJob()
   }

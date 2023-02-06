@@ -1,7 +1,7 @@
 import {
     DISPLAY_ALERT, CLEAR_ALERT, REGISTER_USER_BEGIN, REGISTER_USER_SUCCESS, REGISTER_USER_ERROR,
     LOGIN_USER_BEGIN, LOGIN_USER_SUCCESS, LOGIN_USER_ERROR, UPDATE_USER_BEGIN, UPDATE_USER_SUCCESS, UPDATE_USER_ERROR,
-    CREATE_JOB_BEGIN, CREATE_JOB_SUCCESS, CREATE_JOB_ERROR,TOGGLE_SIDEBAR,LOGOUT_USER, HANDLE_CHANGE, CLEAR_VALUES
+    CREATE_JOB_BEGIN, CREATE_JOB_SUCCESS, CREATE_JOB_ERROR, GET_JOB_BEGIN, GET_JOB_SUCCESS, GET_JOB_ERROR, SET_EDIT_JOB, TOGGLE_SIDEBAR,LOGOUT_USER, HANDLE_CHANGE, CLEAR_VALUES
 } from './actions';
 import { initialState } from './appContext';
 const reducer = (state, action) => {
@@ -137,6 +137,45 @@ const reducer = (state, action) => {
                 alertText: action.payload.msg
             }
         }
+        case GET_JOB_BEGIN:{
+            return {
+                ...state, isLoading:true,showAlert:false
+            }
+        }
+        case GET_JOB_SUCCESS:{
+            return {
+                ...state,
+                isLoading:false,
+                jobs:action.payload.jobs,
+                totalJobs:action.payload.totalJobs,
+                numOfPages:action.payload.numOfPages
+            }
+        }
+        case GET_JOB_ERROR:{
+            return {
+                ...state,
+                isLoading:false,
+                showAlert:true,
+                alertType:'danger',
+                alertText: action.payload.msg
+            }
+        }
+        case SET_EDIT_JOB:{
+            const job=state.jobs.find(job=>job._id==action.payload.id)
+            const {_id,position,company,jobLocation,status,jobType}=job;
+
+            return {
+                ...state,
+                isEditing:true,
+                editJobId:_id,
+                position,
+                company,
+                jobLocation,
+                status,
+                jobType
+            }
+        }
+
         case HANDLE_CHANGE: {
             return {
                 ...state, [action.payload.name]: action.payload.value
@@ -157,6 +196,7 @@ const reducer = (state, action) => {
                 ...state,...initialState
             }
         }
+
 
         default:
             throw new Error(`no such action : ${action.type}`)
