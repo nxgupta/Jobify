@@ -2,7 +2,7 @@ import { useReducer, useContext, createContext } from 'react'
 import {
     DISPLAY_ALERT, CLEAR_ALERT, REGISTER_USER_BEGIN, REGISTER_USER_SUCCESS, REGISTER_USER_ERROR,
     LOGIN_USER_BEGIN, LOGIN_USER_SUCCESS, LOGIN_USER_ERROR, UPDATE_USER_BEGIN, UPDATE_USER_SUCCESS, UPDATE_USER_ERROR,
-    CREATE_JOB_BEGIN, CREATE_JOB_SUCCESS, CREATE_JOB_ERROR, TOGGLE_SIDEBAR, LOGOUT_USER, HANDLE_CHANGE, CLEAR_VALUES
+    CREATE_JOB_BEGIN, CREATE_JOB_SUCCESS, CREATE_JOB_ERROR, GET_JOB_BEGIN, GET_JOB_SUCCESS, GET_JOB_ERROR, SET_EDIT_JOB,  TOGGLE_SIDEBAR, LOGOUT_USER, HANDLE_CHANGE, CLEAR_VALUES
 } from './actions';
 import reducer from './reducer';
 import { endPoint } from '../App';
@@ -30,7 +30,11 @@ const initialState = {
     jobTypeOptions: ['full-time', 'part-time', 'remote', 'internship'],
     jobType: 'full-time',
     statusOptions: ['interview', 'declined', 'pending'],
-    status: 'pending'
+    status: 'pending',
+    jobs: [],
+    totalJobs: 0,
+    numOfPages: 1,
+    page: 1,
 }
 
 const AppContext = createContext();
@@ -156,8 +160,8 @@ const AppProvider = ({ children }) => {
                 jobType,
                 status,
             } = state
-            
-            await authFetch.post('/jobs',{
+
+            await authFetch.post('/jobs', {
                 position,
                 company,
                 jobLocation,
@@ -181,6 +185,41 @@ const AppProvider = ({ children }) => {
         }
         clearAlert();
     }
+    const getJobs = async () => {
+        dispatch({ type: GET_JOB_BEGIN })
+        try {
+            const { data } = await authFetch.get('/jobs')
+            const { jobs, totalJobs, numOfPages } = data;
+            dispatch({
+                type: GET_JOB_SUCCESS,
+                payload: {
+                    jobs,
+                    totalJobs,
+                    numOfPages
+                }
+            })
+        }
+        catch (error) {
+            console.log(error)
+            //logoutUser()
+
+            dispatch({
+                type: GET_JOB_ERROR,
+                payload: { msg: error.response.data.msg }
+            })
+        }
+        clearAlert()
+    }
+    const setEditJob=(id)=>{
+        console.log(`edit job : ${id}`)
+        dispatch({
+            type:SET_EDIT_JOB,
+            payload:{id}
+        })
+    }
+    const editJob=()=>{
+        console.log('edit job')
+    }
     const handleChange = ({ name, value }) => {
         dispatch({
             type: HANDLE_CHANGE,
@@ -189,7 +228,9 @@ const AppProvider = ({ children }) => {
             }
         })
     }
-
+    const deleteJob=(id)=>{
+        console.log(`delete job : ${id}`)
+    }
     const clearValues = () => {
         dispatch({
             type: CLEAR_VALUES,
@@ -198,13 +239,11 @@ const AppProvider = ({ children }) => {
     const toggleSidebar = () => {
         dispatch({ type: TOGGLE_SIDEBAR })
     }
-
     const logoutUser = () => {
         dispatch({ type: LOGOUT_USER })
         removeUserFromLocalStorage()
     }
-
-    return <AppContext.Provider value={{ ...state, displayAlert, clearAlert, registerUser, loginUser, toggleSidebar, logoutUser, handleChange, updateUser, clearValues,createJob }}>
+    return <AppContext.Provider value={{ ...state, displayAlert, clearAlert, registerUser, loginUser, toggleSidebar, logoutUser, handleChange, updateUser, clearValues, createJob, getJobs, setEditJob, editJob, deleteJob }}>
         {children}
     </AppContext.Provider>
 }
