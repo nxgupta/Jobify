@@ -29,7 +29,6 @@ const Addjob = () => {
       displayAlert()
       return
     }
-
     if(isEditing){
       editJob()
       return;

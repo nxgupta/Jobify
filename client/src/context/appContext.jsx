@@ -1,8 +1,33 @@
 import { useReducer, useContext, createContext } from 'react'
 import {
-    DISPLAY_ALERT, CLEAR_ALERT, REGISTER_USER_BEGIN, REGISTER_USER_SUCCESS, REGISTER_USER_ERROR,
-    LOGIN_USER_BEGIN, LOGIN_USER_SUCCESS, LOGIN_USER_ERROR, UPDATE_USER_BEGIN, UPDATE_USER_SUCCESS, UPDATE_USER_ERROR,
-    CREATE_JOB_BEGIN, CREATE_JOB_SUCCESS, CREATE_JOB_ERROR, GET_JOB_BEGIN, GET_JOB_SUCCESS, GET_JOB_ERROR, SET_EDIT_JOB,  TOGGLE_SIDEBAR, LOGOUT_USER, HANDLE_CHANGE, CLEAR_VALUES
+    DISPLAY_ALERT,
+    CLEAR_ALERT,
+    REGISTER_USER_BEGIN,
+    REGISTER_USER_SUCCESS,
+    REGISTER_USER_ERROR,
+    LOGIN_USER_BEGIN,
+    LOGIN_USER_SUCCESS,
+    LOGIN_USER_ERROR,
+    UPDATE_USER_BEGIN,
+    UPDATE_USER_SUCCESS,
+    UPDATE_USER_ERROR,
+    CREATE_JOB_BEGIN,
+    CREATE_JOB_SUCCESS,
+    CREATE_JOB_ERROR,
+    GET_JOB_BEGIN,
+    GET_JOB_SUCCESS,
+    GET_JOB_ERROR,
+    SET_EDIT_JOB,
+    EDIT_JOB_BEGIN,
+    EDIT_JOB_SUCCESS,
+    EDIT_JOB_ERROR,
+    DELETE_JOB_BEGIN,
+    SHOW_STATS_BEGIN,
+    SHOW_STATS_SUCCESS,
+    TOGGLE_SIDEBAR,
+    LOGOUT_USER,
+    HANDLE_CHANGE,
+    CLEAR_VALUES
 } from './actions';
 import reducer from './reducer';
 import { endPoint } from '../App';
@@ -35,6 +60,8 @@ const initialState = {
     totalJobs: 0,
     numOfPages: 1,
     page: 1,
+    stats:{},
+    monthlyApplication:[]
 }
 
 const AppContext = createContext();
@@ -210,15 +237,80 @@ const AppProvider = ({ children }) => {
         }
         clearAlert()
     }
-    const setEditJob=(id)=>{
-        console.log(`edit job : ${id}`)
+    const setEditJob = (id) => {
         dispatch({
-            type:SET_EDIT_JOB,
-            payload:{id}
+            type: SET_EDIT_JOB,
+            payload: { id }
         })
     }
-    const editJob=()=>{
-        console.log('edit job')
+    const editJob = async () => {
+        dispatch({
+            type: EDIT_JOB_BEGIN
+        })
+        try {
+            const {
+                position,
+                company,
+                jobLocation,
+                jobType,
+                status,
+                editJobId
+            } = state
+            await authFetch.patch(`/jobs/${editJobId}`, {
+                position,
+                company,
+                jobLocation,
+                jobType,
+                status,
+            })
+            dispatch({
+                type: EDIT_JOB_SUCCESS,
+            })
+            dispatch({
+                type: CLEAR_VALUES,
+            })
+        }
+        catch (error) {
+            if (error.response.status === 401) {
+                logoutUser()
+            }
+            dispatch({
+                type: EDIT_JOB_ERROR,
+                payload: { msg: error.response.data.msg }
+            })
+        }
+        clearAlert();
+    }
+    const deleteJob = async (jobId) => {
+        dispatch({
+            type: DELETE_JOB_BEGIN,
+        })
+        try {
+            await authFetch.delete(`/jobs/${jobId}`)
+            getJobs()
+        }
+        catch (error) {
+            logoutUser()
+        }
+    }
+    const fetchStats=async ()=>{
+        dispatch({
+            type:SHOW_STATS_BEGIN
+        })
+        try{
+            let {data}=await authFetch('/jobs/stats')
+            dispatch({
+                type:SHOW_STATS_SUCCESS,
+                payload:{
+                    defaultStats:data.defaultStats,
+                    monthlyApplication:data.monthlyApplication
+                }
+            })
+        }
+        catch(error){
+            console.log(error)
+            //logoutUser()
+        }
     }
     const handleChange = ({ name, value }) => {
         dispatch({
@@ -227,9 +319,6 @@ const AppProvider = ({ children }) => {
                 name, value
             }
         })
-    }
-    const deleteJob=(id)=>{
-        console.log(`delete job : ${id}`)
     }
     const clearValues = () => {
         dispatch({
@@ -243,7 +332,7 @@ const AppProvider = ({ children }) => {
         dispatch({ type: LOGOUT_USER })
         removeUserFromLocalStorage()
     }
-    return <AppContext.Provider value={{ ...state, displayAlert, clearAlert, registerUser, loginUser, toggleSidebar, logoutUser, handleChange, updateUser, clearValues, createJob, getJobs, setEditJob, editJob, deleteJob }}>
+    return <AppContext.Provider value={{ ...state, displayAlert, clearAlert, registerUser, loginUser, toggleSidebar, logoutUser, handleChange, updateUser, clearValues, createJob, getJobs, setEditJob, editJob, deleteJob,fetchStats }}>
         {children}
     </AppContext.Provider>
 }
