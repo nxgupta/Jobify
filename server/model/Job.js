@@ -1,15 +1,15 @@
 import mongoose from 'mongoose';
 import User from './User.js';
 const JobSchema = new mongoose.Schema({
-    position: {
-        type: String,
-        maxlength: 50,
-        required:[true, 'Please provide position']
-    },
     company: {
         type: String,
         maxlength: 100,
         required:[true, 'Please provide company']
+    },
+    position: {
+        type: String,
+        maxlength: 50,
+        required:[true, 'Please provide position']
     },
     jobLocation: {
         type: String,

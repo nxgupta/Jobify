@@ -1,7 +1,32 @@
 import {
-    DISPLAY_ALERT, CLEAR_ALERT, REGISTER_USER_BEGIN, REGISTER_USER_SUCCESS, REGISTER_USER_ERROR,
-    LOGIN_USER_BEGIN, LOGIN_USER_SUCCESS, LOGIN_USER_ERROR, UPDATE_USER_BEGIN, UPDATE_USER_SUCCESS, UPDATE_USER_ERROR,
-    CREATE_JOB_BEGIN, CREATE_JOB_SUCCESS, CREATE_JOB_ERROR, GET_JOB_BEGIN, GET_JOB_SUCCESS, GET_JOB_ERROR, SET_EDIT_JOB, TOGGLE_SIDEBAR,LOGOUT_USER, HANDLE_CHANGE, CLEAR_VALUES
+    DISPLAY_ALERT,
+    CLEAR_ALERT,
+    REGISTER_USER_BEGIN,
+    REGISTER_USER_SUCCESS,
+    REGISTER_USER_ERROR,
+    LOGIN_USER_BEGIN,
+    LOGIN_USER_SUCCESS,
+    LOGIN_USER_ERROR,
+    UPDATE_USER_BEGIN,
+    UPDATE_USER_SUCCESS,
+    UPDATE_USER_ERROR,
+    CREATE_JOB_BEGIN,
+    CREATE_JOB_SUCCESS,
+    CREATE_JOB_ERROR,
+    GET_JOB_BEGIN,
+    GET_JOB_SUCCESS,
+    GET_JOB_ERROR,
+    SET_EDIT_JOB,
+    EDIT_JOB_BEGIN,
+    EDIT_JOB_SUCCESS,
+    EDIT_JOB_ERROR,
+    DELETE_JOB_BEGIN,
+    SHOW_STATS_BEGIN,
+    SHOW_STATS_SUCCESS,
+    TOGGLE_SIDEBAR,
+    LOGOUT_USER,
+    HANDLE_CHANGE,
+    CLEAR_VALUES
 } from './actions';
 import { initialState } from './appContext';
 const reducer = (state, action) => {
@@ -94,7 +119,7 @@ const reducer = (state, action) => {
         }
         case UPDATE_USER_SUCCESS: {
             return {
-                ...state, 
+                ...state,
                 isLoading: false,
                 token: action.payload.token,
                 user: action.payload.user,
@@ -113,61 +138,61 @@ const reducer = (state, action) => {
                 alertText: action.payload.msg
             }
         }
-        case CREATE_JOB_BEGIN:{
+        case CREATE_JOB_BEGIN: {
             return {
                 ...state,
-                isLoading:true
+                isLoading: true
             }
         }
-        case CREATE_JOB_SUCCESS:{
+        case CREATE_JOB_SUCCESS: {
             return {
                 ...state,
-                isLoading:false,
+                isLoading: false,
                 showAlert: true,
                 alertType: 'success',
                 alertText: 'New Job Created',
             }
         }
-        case CREATE_JOB_ERROR:{
+        case CREATE_JOB_ERROR: {
             return {
                 ...state,
-                isLoading:false,
-                showAlert:true,
-                alertType:'danger',
+                isLoading: false,
+                showAlert: true,
+                alertType: 'danger',
                 alertText: action.payload.msg
             }
         }
-        case GET_JOB_BEGIN:{
+        case GET_JOB_BEGIN: {
             return {
-                ...state, isLoading:true,showAlert:false
+                ...state, isLoading: true, showAlert: false
             }
         }
-        case GET_JOB_SUCCESS:{
+        case GET_JOB_SUCCESS: {
             return {
                 ...state,
-                isLoading:false,
-                jobs:action.payload.jobs,
-                totalJobs:action.payload.totalJobs,
-                numOfPages:action.payload.numOfPages
+                isLoading: false,
+                jobs: action.payload.jobs,
+                totalJobs: action.payload.totalJobs,
+                numOfPages: action.payload.numOfPages
             }
         }
-        case GET_JOB_ERROR:{
+        case GET_JOB_ERROR: {
             return {
                 ...state,
-                isLoading:false,
-                showAlert:true,
-                alertType:'danger',
+                isLoading: false,
+                showAlert: true,
+                alertType: 'danger',
                 alertText: action.payload.msg
             }
         }
-        case SET_EDIT_JOB:{
-            const job=state.jobs.find(job=>job._id==action.payload.id)
-            const {_id,position,company,jobLocation,status,jobType}=job;
+        case SET_EDIT_JOB: {
+            const job = state.jobs.find(job => job._id == action.payload.id)
+            const { _id, position, company, jobLocation, status, jobType } = job;
 
             return {
                 ...state,
-                isEditing:true,
-                editJobId:_id,
+                isEditing: true,
+                editJobId: _id,
                 position,
                 company,
                 jobLocation,
@@ -175,7 +200,52 @@ const reducer = (state, action) => {
                 jobType
             }
         }
+        case EDIT_JOB_BEGIN: {
+            return {
+                ...state,
+                isLoading: true
+            }
+        }
+        case EDIT_JOB_SUCCESS: {
+            return {
+                ...state,
+                isLoading: false,
+                showAlert: true,
+                alertType: 'success',
+                alertText: 'Job Updated',
+            }
+        }
+        case EDIT_JOB_ERROR: {
+            return {
+                ...state,
+                isLoading: false,
+                showAlert: true,
+                alertType: 'danger',
+                alertText: action.payload.msg
+            }
+        }
 
+        case DELETE_JOB_BEGIN: {
+            return {
+                ...state,
+                isLoading: true
+            }
+        }
+
+        case SHOW_STATS_BEGIN: {
+            return {
+                ...state,
+                isLoading: true
+            }
+        }
+        case SHOW_STATS_SUCCESS: {
+            return {
+                ...state,
+                isLoading: false,
+                stats: action.payload.defaultStats,
+                monthlyApplication: action.payload.monthlyApplication
+            }
+        }
         case HANDLE_CHANGE: {
             return {
                 ...state, [action.payload.name]: action.payload.value
@@ -183,17 +253,17 @@ const reducer = (state, action) => {
         }
 
         case CLEAR_VALUES: {
-            const initialState={
-                isEditing:false,
-                editJobId:'',
-                position:'',
-                company:'',
-                jobLocation:state.userLocation,
-                jobType:'full-time',
-                status:'pending'
+            const initialState = {
+                isEditing: false,
+                editJobId: '',
+                position: '',
+                company: '',
+                jobLocation: state.userLocation,
+                jobType: 'full-time',
+                status: 'pending'
             }
             return {
-                ...state,...initialState
+                ...state, ...initialState
             }
         }
 
