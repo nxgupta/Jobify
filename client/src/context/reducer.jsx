@@ -26,7 +26,8 @@ import {
     TOGGLE_SIDEBAR,
     LOGOUT_USER,
     HANDLE_CHANGE,
-    CLEAR_VALUES
+    CLEAR_VALUES,
+    CLEAR_FILTERS
 } from './actions';
 import { initialState } from './appContext';
 const reducer = (state, action) => {
@@ -243,7 +244,7 @@ const reducer = (state, action) => {
                 ...state,
                 isLoading: false,
                 stats: action.payload.defaultStats,
-                monthlyApplication: action.payload.monthlyApplication
+                monthlyApplications: action.payload.monthlyApplications
             }
         }
         case HANDLE_CHANGE: {
@@ -251,7 +252,15 @@ const reducer = (state, action) => {
                 ...state, [action.payload.name]: action.payload.value
             }
         }
-
+        case CLEAR_FILTERS: {
+            return {
+                ...state,
+                search: '',
+                searchStatus: 'all',
+                searchType: 'all',
+                sort: 'latest',
+            }
+        }
         case CLEAR_VALUES: {
             const initialState = {
                 isEditing: false,

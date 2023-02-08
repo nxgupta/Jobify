@@ -27,7 +27,8 @@ import {
     TOGGLE_SIDEBAR,
     LOGOUT_USER,
     HANDLE_CHANGE,
-    CLEAR_VALUES
+    CLEAR_VALUES,
+    CLEAR_FILTERS
 } from './actions';
 import reducer from './reducer';
 import { endPoint } from '../App';
@@ -61,7 +62,12 @@ const initialState = {
     numOfPages: 1,
     page: 1,
     stats:{},
-    monthlyApplication:[]
+    monthlyApplications:[],
+    search:'',
+    searchStatus:'all',
+    searchType:'all',
+    sort:'latest',
+    sortOptions: ['latest','oldest','a-z','z-a']
 }
 
 const AppContext = createContext();
@@ -213,9 +219,12 @@ const AppProvider = ({ children }) => {
         clearAlert();
     }
     const getJobs = async () => {
+        const {search,searchStatus,searchType,sort}=state;
+        let url=`/jobs?status=${searchStatus}&jobType=${searchType}&sort=${sort}`
+        if(search) url=url+`&search=${search}`
         dispatch({ type: GET_JOB_BEGIN })
         try {
-            const { data } = await authFetch.get('/jobs')
+            const { data } = await authFetch.get(url)
             const { jobs, totalJobs, numOfPages } = data;
             dispatch({
                 type: GET_JOB_SUCCESS,
@@ -293,7 +302,7 @@ const AppProvider = ({ children }) => {
             logoutUser()
         }
     }
-    const fetchStats=async ()=>{
+    const showStats=async ()=>{
         dispatch({
             type:SHOW_STATS_BEGIN
         })
@@ -303,7 +312,7 @@ const AppProvider = ({ children }) => {
                 type:SHOW_STATS_SUCCESS,
                 payload:{
                     defaultStats:data.defaultStats,
-                    monthlyApplication:data.monthlyApplication
+                    monthlyApplications:data.monthlyApplications
                 }
             })
         }
@@ -311,6 +320,9 @@ const AppProvider = ({ children }) => {
             console.log(error)
             //logoutUser()
         }
+    }
+    const clearFilters=()=>{
+        dispatch({type:CLEAR_FILTERS})
     }
     const handleChange = ({ name, value }) => {
         dispatch({
@@ -332,7 +344,7 @@ const AppProvider = ({ children }) => {
         dispatch({ type: LOGOUT_USER })
         removeUserFromLocalStorage()
     }
-    return <AppContext.Provider value={{ ...state, displayAlert, clearAlert, registerUser, loginUser, toggleSidebar, logoutUser, handleChange, updateUser, clearValues, createJob, getJobs, setEditJob, editJob, deleteJob,fetchStats }}>
+    return <AppContext.Provider value={{ ...state, displayAlert, clearAlert, registerUser, loginUser, toggleSidebar, logoutUser, handleChange, updateUser, clearValues, createJob, getJobs, setEditJob, editJob, deleteJob,showStats, clearFilters }}>
         {children}
     </AppContext.Provider>
 }

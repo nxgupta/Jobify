@@ -4,6 +4,7 @@ import { StatusCodes } from 'http-status-codes'
 import { badRequestError, notFoundError } from '../errors/index.js'
 import { catchAsync } from '../utils/catchAsync.js';
 import checkPermissions from '../utils/checkPermissions.js'
+import moment from 'moment'
 
 const createJob = catchAsync(async (req, res) => {
     const { position, company } = req.body;
@@ -27,10 +28,46 @@ const deleteJob = catchAsync(async (req, res) => {
 })
 
 const getAllJobs = catchAsync(async (req, res) => {
-    const jobs = await Job.find({ createdBy: req.user.userId })
-    res.status(StatusCodes.OK).json({ jobs, totalJobs: jobs.length, numOfPages: 1 })
-})
+    const { search, status, jobType, sort } = req.query
+    const queryObject = {
+        createdBy: req.user.userId,
+    }
+    if (status !== 'all' && status !== undefined) {
+        queryObject.status = status
+    }
+    if (jobType !== 'all' && jobType !== undefined) {
+        queryObject.jobType = jobType
+    }
+    if (search) {
+        queryObject.position = { $regex: search, $options: 'i' }
+    }
+    console.log(queryObject)
+    //NO AWAIT
+    let result = Job.find(queryObject)
 
+    if (sort === 'latest') {
+        result = result.sort('-createdAt')
+    }
+    if (sort === 'oldest') {
+        result = result.sort('createdAt')
+    }
+    if (sort === 'a-z') {
+        result = result.sort('position')
+    }
+    if (sort === 'z-a') {
+        result = result.sort('-position')
+    }
+
+    let page=Number(req.query.page) || 1
+    let limit=Number(req.query.limit) || 10
+    let skip=(page-1) * limit
+
+    result = result.skip(skip).limit(limit)
+    const jobs = await result;
+    const totalJobs=await Job.countDocuments(queryObject);
+    const numOfPages=Math.ceil(totalJobs/limit);
+    res.status(StatusCodes.OK).json({ jobs, totalJobs,numOfPages})
+})
 const updateJob = catchAsync(async (req, res) => {
     const { id: jobId } = req.params
     const { company, position } = req.body
@@ -48,26 +85,42 @@ const updateJob = catchAsync(async (req, res) => {
     })
     res.status(StatusCodes.OK).json({ updatedJob })
 })
-
 const showStats = catchAsync(
     async (req, res) => {
-    let stats = await Job.aggregate([
-        {$match:{createdBy:mongoose.Types.ObjectId(req.user.userId)}},
-        {$group:{_id:'$status', count:{$sum:1}}}
-    ]
-    )
-    stats=stats.reduce((acc,curr)=>{
-        acc[curr._id]=curr.count
-        return acc;
-    },{})
-    
-    const defaultStats={
-        pending: stats.pending || 0,
-        interview: stats.interview || 0,
-        declined:stats.declined || 0
+        let stats = await Job.aggregate([
+            { $match: { createdBy: mongoose.Types.ObjectId(req.user.userId) } },
+            { $group: { _id: '$status', count: { $sum: 1 } } }
+        ]
+        )
+        stats = stats.reduce((acc, curr) => {
+            acc[curr._id] = curr.count
+            return acc;
+        }, {})
+
+        const defaultStats = {
+            pending: stats.pending || 0,
+            interview: stats.interview || 0,
+            declined: stats.declined || 0
+        }
+        let monthlyApplications = await Job.aggregate([
+            { $match: { createdBy: mongoose.Types.ObjectId(req.user.userId) } },
+            {
+                $group: {
+                    _id: { year: { $year: '$createdAt' }, month: { $month: '$createdAt' } },
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { '_id.year': -1, '_id.month': -1 } },
+            { $limit: 6 }
+        ])
+        monthlyApplications = monthlyApplications.map((item, index) => {
+            const { _id: { year, month }, count } = item;
+            let date = moment().month(month - 1).year(year)
+            date = date.format('MMM Y')
+            return { date, count }
+        }).reverse()
+        res.status(StatusCodes.OK).json({ defaultStats, monthlyApplications })
     }
-    const monthlyApplication=[]
-    res.status(StatusCodes.OK).json({defaultStats,monthlyApplication})
-}
 )
 export { createJob, deleteJob, getAllJobs, updateJob, showStats };
+
