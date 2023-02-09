@@ -7,11 +7,11 @@ import PageBtnContainer from "./PageBtnContainer"
 
 
 const JobsContainer = () => {
-    const { getJobs,isLoading,jobs,totalJobs,numOfPages,search,searchStatus,searchType,sort } = useAppContext();
+    const { getJobs,isLoading,jobs,totalJobs,page,numOfPages,search,searchStatus,searchType,sort } = useAppContext();
 
     useEffect(() => {
         getJobs()
-    }, [search,searchStatus,searchType,sort])
+    }, [search,searchStatus,searchType,sort,page])
 
     if(isLoading){
         return <Loading center/>

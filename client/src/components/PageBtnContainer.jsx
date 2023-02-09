@@ -3,20 +3,25 @@ import { HiChevronDoubleLeft, HiChevronDoubleRight } from "react-icons/hi"
 import Wrapper from "../assets/wrappers/PageBtnContainer"
 
 const PageBtnContainer = () => {
-  const { } = useAppContext()
+  const {numOfPages, page, changePage} = useAppContext()
   const nextPage = () => {
-    console.log('next page')
+    if(page<numOfPages) changePage(page+1)
   }
   const prevPage = () => {
-    console.log('prev page')
+    if(page>1) changePage(page-1)
   }
+  const pages=Array.from({length:numOfPages},(_,i)=>i+1);
   return (
     <Wrapper>
       <button className="prev-btn" onClick={prevPage}>
         <HiChevronDoubleLeft />
         prev
       </button>
-      <div className="btn-container">buttons</div>
+      <div className="btn-container">
+        {
+          pages.map(pageNumber=><button type='button' className={pageNumber===page?"pageBtn active":"pageBtn"} key={pageNumber} onClick={()=>changePage(pageNumber)}>{pageNumber}</button>)
+        }
+      </div>
       <button className="next-btn" onClick={nextPage}>
         next
         <HiChevronDoubleRight />
