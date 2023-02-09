@@ -16,6 +16,7 @@ import {
     GET_JOB_BEGIN,
     GET_JOB_SUCCESS,
     GET_JOB_ERROR,
+    CHANGE_PAGE,
     SET_EDIT_JOB,
     EDIT_JOB_BEGIN,
     EDIT_JOB_SUCCESS,
@@ -186,6 +187,11 @@ const reducer = (state, action) => {
                 alertText: action.payload.msg
             }
         }
+        case CHANGE_PAGE:{
+            return {
+                ...state, page:action.payload.page
+            }
+        }
         case SET_EDIT_JOB: {
             const job = state.jobs.find(job => job._id == action.payload.id)
             const { _id, position, company, jobLocation, status, jobType } = job;
@@ -249,7 +255,7 @@ const reducer = (state, action) => {
         }
         case HANDLE_CHANGE: {
             return {
-                ...state, [action.payload.name]: action.payload.value
+                ...state, [action.payload.name]: action.payload.value, page:1
             }
         }
         case CLEAR_FILTERS: {

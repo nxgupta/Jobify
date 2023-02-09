@@ -1,4 +1,7 @@
-//express
+import helmet from 'helmet'
+import xss from 'xss-clean'
+import mongoSanitize from 'express-mongo-sanitize'
+import rateLimit from 'express-rate-limit'//express
 import express from 'express'
 const app=express()
 
@@ -31,6 +34,16 @@ const port=process.env.PORT || 5000;
 
 //body in json
 app.use(express.json())
+app.use(helmet())
+app.use(xss())
+app.use(mongoSanitize())
+const limiter = rateLimit({
+	windowMs: 10 * 60 * 1000,
+	max: 100,
+    message:'Too many requests from this IP Address, Please try again after 10 minutes'
+
+})
+app.use(limiter)
 
 //setting home route
 app.get('/',(req,res)=>{
@@ -39,6 +52,7 @@ app.get('/',(req,res)=>{
 
 //in order to authenticate user, for jobs
 import authenticateUser from './middleware/Auth.js'
+import helmet from 'helmet'
 
 app.use('/api/v1/auth',authRouter)
 app.use('/api/v1/jobs',authenticateUser, jobsRouter)
