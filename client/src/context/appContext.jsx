@@ -54,10 +54,10 @@ const initialState = {
     editJobId: '',
     position: '',
     company: '',
-    jobTypeOptions: ['full-time', 'part-time', 'remote', 'internship'],
-    jobType: 'full-time',
-    statusOptions: ['interview', 'declined', 'pending'],
-    status: 'pending',
+    jobTypeOptions: ['Full-Time', 'Part-Time', 'Remote', 'Internship'],
+    jobType: 'Full-Time',
+    statusOptions: ['Interview', 'Declined', 'Pending'],
+    status: 'Pending',
     jobs: [],
     totalJobs: 0,
     numOfPages: 1,
@@ -65,10 +65,10 @@ const initialState = {
     stats:{},
     monthlyApplications:[],
     search:'',
-    searchStatus:'all',
-    searchType:'all',
-    sort:'latest',
-    sortOptions: ['latest','oldest','a-z','z-a']
+    searchStatus:'All',
+    searchType:'All',
+    sort:'Latest',
+    sortOptions: ['Latest','Oldest','A-Z','Z-A']
 }
 
 const AppContext = createContext();
@@ -154,7 +154,7 @@ const AppProvider = ({ children }) => {
             addUserToLocalStorage({ user, token, location })
         }
         catch (err) {
-            dispatch({ type: LOGIN_USER_ERROR, payload: { msg: err.response.data } })
+            dispatch({ type: LOGIN_USER_ERROR, payload: { msg: err.response.data.msg } })
         }
         clearAlert()
     }

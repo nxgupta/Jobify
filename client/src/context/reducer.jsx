@@ -262,9 +262,9 @@ const reducer = (state, action) => {
             return {
                 ...state,
                 search: '',
-                searchStatus: 'all',
-                searchType: 'all',
-                sort: 'latest',
+                searchStatus: 'All',
+                searchType: 'All',
+                sort: 'Latest',
             }
         }
         case CLEAR_VALUES: {
@@ -274,8 +274,8 @@ const reducer = (state, action) => {
                 position: '',
                 company: '',
                 jobLocation: state.userLocation,
-                jobType: 'full-time',
-                status: 'pending'
+                jobType: 'Full-Time',
+                status: 'Pending'
             }
             return {
                 ...state, ...initialState

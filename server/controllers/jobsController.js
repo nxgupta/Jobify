@@ -32,10 +32,10 @@ const getAllJobs = catchAsync(async (req, res) => {
     const queryObject = {
         createdBy: req.user.userId,
     }
-    if (status !== 'all' && status !== undefined) {
+    if (status !== 'All' && status !== undefined) {
         queryObject.status = status
     }
-    if (jobType !== 'all' && jobType !== undefined) {
+    if (jobType !== 'All' && jobType !== undefined) {
         queryObject.jobType = jobType
     }
     if (search) {
@@ -45,7 +45,7 @@ const getAllJobs = catchAsync(async (req, res) => {
     //NO AWAIT
     let result = Job.find(queryObject)
 
-    if (sort === 'latest') {
+    if (sort === 'Latest') {
         result = result.sort('-createdAt')
     }
     if (sort === 'oldest') {

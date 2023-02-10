@@ -41,7 +41,7 @@ const Wrapper = styled.article`
       letter-spacing: var(--letterSpacing);
     }
   }
-  .pending {
+  .Pending {
     background: #fcefc7;
     color: #e9b949;
   }
