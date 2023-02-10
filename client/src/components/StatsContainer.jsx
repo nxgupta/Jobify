@@ -8,7 +8,7 @@ const StatsContainer = () => {
     const {stats}=useAppContext();
     const defaultStats=[
         {
-            title:'pending applications',
+            title:'Pending applications',
             count: stats.pending || 0,
             icon: <FaSuitcaseRolling/>,
             color: '#e9b949',

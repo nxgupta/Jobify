@@ -39,7 +39,7 @@ app.use(xss())
 app.use(mongoSanitize())
 const limiter = rateLimit({
 	windowMs: 10 * 60 * 1000,
-	max: 100,
+	max: 1000,
     message:'Too many requests from this IP Address, Please try again after 10 minutes'
 
 })
@@ -52,7 +52,6 @@ app.get('/',(req,res)=>{
 
 //in order to authenticate user, for jobs
 import authenticateUser from './middleware/Auth.js'
-import helmet from 'helmet'
 
 app.use('/api/v1/auth',authRouter)
 app.use('/api/v1/jobs',authenticateUser, jobsRouter)
