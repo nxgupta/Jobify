@@ -29,7 +29,8 @@ import {
     LOGOUT_USER,
     HANDLE_CHANGE,
     CLEAR_VALUES,
-    CLEAR_FILTERS
+    CLEAR_FILTERS,
+    DELETE_JOB_ERROR
 } from './actions';
 import reducer from './reducer';
 import { endPoint } from '../App';
@@ -143,7 +144,7 @@ const AppProvider = ({ children }) => {
     const loginUser = async (currentUser) => {
         dispatch({ type: LOGIN_USER_BEGIN })
         try {
-            const res = await axios.post(`${endPoint}/auth/login`, currentUser)
+            const res = await axios.post(`${endPoint}/auth/login`, currentUser, {withCredentials:true})
             const { user, token, location } = res.data;
             dispatch({
                 type: LOGIN_USER_SUCCESS,
@@ -286,9 +287,7 @@ const AppProvider = ({ children }) => {
             })
         }
         catch (error) {
-            if (error.response.status === 401) {
-                logoutUser()
-            }
+            if (error.response.status === 401) return;
             dispatch({
                 type: EDIT_JOB_ERROR,
                 payload: { msg: error.response.data.msg }
@@ -305,8 +304,13 @@ const AppProvider = ({ children }) => {
             getJobs()
         }
         catch (error) {
-            logoutUser()
+            if(error.response.status===401) return;
+            dispatch({
+                type: DELETE_JOB_ERROR,
+                payload: { msg: error.response.data.msg }
+            })
         }
+        clearAlert()
     }
 
     const showStats=async ()=>{

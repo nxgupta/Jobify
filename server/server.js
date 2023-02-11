@@ -3,6 +3,7 @@ import xss from 'xss-clean'
 import mongoSanitize from 'express-mongo-sanitize'
 import rateLimit from 'express-rate-limit'//express
 import express from 'express'
+import cookieParser from 'cookie-parser'
 const app=express()
 
 //dotenv
@@ -17,7 +18,10 @@ if(process.env.NODE_ENV!=='production'){
 
 //cors
 import cors from 'cors'
-app.use(cors())
+app.use(cors({
+    origin: `http://localhost:5174`,
+    credentials: true,
+  }))
 
 //routes
 import authRouter from './routes/authRoutes.js'
@@ -37,6 +41,7 @@ app.use(express.json())
 app.use(helmet())
 app.use(xss())
 app.use(mongoSanitize())
+app.use(cookieParser())
 const limiter = rateLimit({
 	windowMs: 10 * 60 * 1000,
 	max: 1000,

@@ -1,16 +1,13 @@
 import Wrapper from "../assets/wrappers/SearchContainer";
 import { useAppContext } from "../context/appContext"
-import { FormRow, FormRowSelect } from './index'
+import { Alert, FormRow, FormRowSelect } from './index'
 import { useState, useMemo } from "react";
 const SearchContainer = () => {
-  const {search, searchStatus, searchType, jobTypeOptions, statusOptions, sort, sortOptions, handleChange, clearFilters } = useAppContext();
+  const {showAlert, searchStatus, searchType, jobTypeOptions, statusOptions, sort, sortOptions, handleChange, clearFilters } = useAppContext();
   const [localSearch,setLocalSearch]=useState('')
   
   const handleSearch = (e) => {
     handleChange({ name: e.target.name, value: e.target.value });
-  }
-  function log(){
-    console.log('debounce')
   }
 
   const debounce = () => {
@@ -32,6 +29,7 @@ const SearchContainer = () => {
   }
   return (
     <Wrapper>
+      {showAlert && <Alert/>}
       <form className="form" onSubmit={handleSubmit}>
         <h4>Search Form</h4>
         <div className="form-center">
