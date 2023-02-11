@@ -2,9 +2,11 @@ import { StatusCodes } from "http-status-codes";
 import { badRequestError, unAuthenticatedError } from "../errors/index.js";
 import User from "../model/User.js"
 import { catchAsync } from "../utils/catchAsync.js";
+import attachCookies from "../utils/attachCookies.js";
 
 
 const register = async (req, res, next) => {
+    
     const { name, email, password } = req.body;
     try {
         if (!name || !email || !password) {
@@ -19,7 +21,7 @@ const register = async (req, res, next) => {
         const user = await User.create({ name, email, password });
 
         const token=user.createJWT()
-
+        attachCookies({res,token})
         res.status(StatusCodes.CREATED).json({user:{name:user.name,email:user.email,lastName:user.lastName,location:user.location},token,location:user.location})
     }
     catch (err) {
@@ -27,7 +29,6 @@ const register = async (req, res, next) => {
     }
 }
 const login = async (req, res,next) => {
-
     try{
     const {email,password}=req.body;
     if(!email || !password){
@@ -46,6 +47,7 @@ const login = async (req, res,next) => {
 
     const token=user.createJWT();
     user.password=undefined
+    attachCookies({res,token})
     res.status(StatusCodes.OK).json({user, token, location:user.location})
 }
 catch(err){
@@ -54,6 +56,7 @@ catch(err){
 
 }
 const updateUser = catchAsync(async (req, res) => {
+
     const {email,name,lastName,location}=req.body
     if(!email || !name || !lastName || !location){
         throw new badRequestError('Please provide all values')
@@ -69,7 +72,7 @@ const updateUser = catchAsync(async (req, res) => {
     await user.save();
 
     const token=user.createJWT();
-
+    attachCookies({res,token})
     res.status(StatusCodes.OK).json({user, token, location:user.location})
 })
 

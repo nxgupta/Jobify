@@ -28,7 +28,8 @@ import {
     LOGOUT_USER,
     HANDLE_CHANGE,
     CLEAR_VALUES,
-    CLEAR_FILTERS
+    CLEAR_FILTERS,
+    DELETE_JOB_ERROR
 } from './actions';
 import { initialState } from './appContext';
 const reducer = (state, action) => {
@@ -236,6 +237,15 @@ const reducer = (state, action) => {
             return {
                 ...state,
                 isLoading: true
+            }
+        }
+        case DELETE_JOB_ERROR: {
+            return {
+                ...state,
+                isLoading: false,
+                showAlert: true,
+                alertType: 'danger',
+                alertText: action.payload.msg
             }
         }
 

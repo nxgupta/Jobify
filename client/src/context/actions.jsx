@@ -21,6 +21,7 @@ export const GET_JOB_SUCCESS='GET_JOB_SUCCESS'
 export const GET_JOB_ERROR='GET_JOB_ERROR'
 
 export const DELETE_JOB_BEGIN='GET_JOB_BEGIN'
+export const DELETE_JOB_ERROR='DELETE_JOB_ERROR'
 
 // implement this later
 // export const DELETE_JOB_SUCCESS='GET_JOB_SUCCESS'
