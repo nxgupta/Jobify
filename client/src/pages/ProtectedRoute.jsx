@@ -1,8 +1,12 @@
 import { Navigate } from "react-router-dom";
+import { Loading } from "../components";
 import { useAppContext } from "../context/appContext"
 
 const ProtectedRoute = ({children}) => {
-    const {user}=useAppContext();
+    const {user, userLoading}=useAppContext();
+    if(userLoading) {
+      return <Loading center/>
+    }
     if(!user){
         return <Navigate to='/landing' />
     }

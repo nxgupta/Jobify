@@ -6,7 +6,6 @@ import attachCookies from "../utils/attachCookies.js";
 
 
 const register = async (req, res, next) => {
-    
     const { name, email, password } = req.body;
     try {
         if (!name || !email || !password) {
@@ -76,4 +75,17 @@ const updateUser = catchAsync(async (req, res) => {
     res.status(StatusCodes.OK).json({user, token, location:user.location})
 })
 
-export { register, login, updateUser }
+const getCurrentUser= catchAsync(async (req,res)=>{
+     const user = await User.findOne({_id:req.user.userId})
+     res.status(StatusCodes.OK).json({user, location: user.location})
+})
+
+const logOut=catchAsync((req,res)=>{
+    res.cookie('token','logout',{
+        httpOnly:true,
+        expires:new Date(Date.now()+1000),
+    })
+    res.status(StatusCodes.OK).json({msg: 'user logged out'})
+})
+
+export { register, login, updateUser, getCurrentUser, logOut }

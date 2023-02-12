@@ -29,7 +29,9 @@ import {
     HANDLE_CHANGE,
     CLEAR_VALUES,
     CLEAR_FILTERS,
-    DELETE_JOB_ERROR
+    DELETE_JOB_ERROR,
+    GET_CURRENT_USER_BEGIN,
+    GET_CURRENT_USER_SUCCESS
 } from './actions';
 import { initialState } from './appContext';
 const reducer = (state, action) => {
@@ -55,7 +57,6 @@ const reducer = (state, action) => {
             return {
                 ...state,
                 isLoading: false,
-                token: action.payload.token,
                 user: action.payload.user,
                 userLocation: action.payload.location,
                 jobLocation: action.payload.location,
@@ -82,7 +83,6 @@ const reducer = (state, action) => {
             return {
                 ...state,
                 isLoading: false,
-                token: action.payload.token,
                 user: action.payload.user,
                 userLocation: action.payload.location,
                 jobLocation: action.payload.location,
@@ -109,10 +109,7 @@ const reducer = (state, action) => {
         case LOGOUT_USER: {
             return {
                 ...initialState,
-                user: null,
-                token: null,
-                jobLocation: '',
-                userLocation: ''
+                userLoading:false
             }
         }
         case UPDATE_USER_BEGIN: {
@@ -124,7 +121,6 @@ const reducer = (state, action) => {
             return {
                 ...state,
                 isLoading: false,
-                token: action.payload.token,
                 user: action.payload.user,
                 userLocation: action.payload.location,
                 jobLocation: action.payload.location,
@@ -177,15 +173,6 @@ const reducer = (state, action) => {
                 jobs: action.payload.jobs,
                 totalJobs: action.payload.totalJobs,
                 numOfPages: action.payload.numOfPages
-            }
-        }
-        case GET_JOB_ERROR: {
-            return {
-                ...state,
-                isLoading: false,
-                showAlert: true,
-                alertType: 'danger',
-                alertText: action.payload.msg
             }
         }
         case CHANGE_PAGE:{
@@ -289,6 +276,20 @@ const reducer = (state, action) => {
             }
             return {
                 ...state, ...initialState
+            }
+        }
+        case GET_CURRENT_USER_BEGIN:{
+            return {
+                ...state, userLoading:true
+            }
+        }
+        case GET_CURRENT_USER_SUCCESS:{
+            return {
+                ...state,
+                userLoading:false, 
+                user:action.payload.user,
+                userLocation:action.payload.location,
+                jobLocation:action.payload.location
             }
         }
 
