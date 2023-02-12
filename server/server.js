@@ -10,6 +10,9 @@ const app=express()
 import dotenv from 'dotenv'
 dotenv.config()
 
+//cookie-parser
+app.use(cookieParser())
+
 //morgon
 import morgan from 'morgan'
 if(process.env.NODE_ENV!=='production'){
@@ -19,7 +22,7 @@ if(process.env.NODE_ENV!=='production'){
 //cors
 import cors from 'cors'
 app.use(cors({
-    origin: `http://localhost:5174`,
+    origin: [`http://localhost:5173`,`http://localhost:5174`],
     credentials: true,
   }))
 
@@ -41,7 +44,6 @@ app.use(express.json())
 app.use(helmet())
 app.use(xss())
 app.use(mongoSanitize())
-app.use(cookieParser())
 const limiter = rateLimit({
 	windowMs: 10 * 60 * 1000,
 	max: 1000,

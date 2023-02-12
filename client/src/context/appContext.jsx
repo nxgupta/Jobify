@@ -1,4 +1,4 @@
-import { useReducer, useContext, createContext } from 'react'
+import { useReducer, useContext, createContext, useEffect } from 'react'
 import {
     DISPLAY_ALERT,
     CLEAR_ALERT,
@@ -16,7 +16,6 @@ import {
     CREATE_JOB_ERROR,
     GET_JOB_BEGIN,
     GET_JOB_SUCCESS,
-    GET_JOB_ERROR,
     CHANGE_PAGE,
     SET_EDIT_JOB,
     EDIT_JOB_BEGIN,
@@ -30,26 +29,24 @@ import {
     HANDLE_CHANGE,
     CLEAR_VALUES,
     CLEAR_FILTERS,
-    DELETE_JOB_ERROR
+    DELETE_JOB_ERROR,
+    GET_CURRENT_USER_BEGIN,
+    GET_CURRENT_USER_SUCCESS 
 } from './actions';
 import reducer from './reducer';
 import { endPoint } from '../App';
 import axios from 'axios';
 
 
-const token = localStorage.getItem('token')
-const user = localStorage.getItem('user')
-const userLocation = localStorage.getItem('location')
-
 const initialState = {
+    userLoading:true,
     isLoading: false,
     showAlert: false,
     alertText: '',
     alertType: '',
-    user: user ? JSON.parse(user) : null,
-    token: token ?? null,
-    userLocation: userLocation ?? '',
-    jobLocation: userLocation ?? '',
+    user: null,
+    userLocation: '',
+    jobLocation: '',
     showSidebar: false,
     isEditing: false,
     editJobId: '',
@@ -63,41 +60,37 @@ const initialState = {
     totalJobs: 0,
     numOfPages: 1,
     page: 1,
-    stats:{},
-    monthlyApplications:[],
-    search:'',
-    searchStatus:'All',
-    searchType:'All',
-    sort:'Latest',
-    sortOptions: ['Latest','Oldest','A-Z','Z-A']
+    stats: {},
+    monthlyApplications: [],
+    search: '',
+    searchStatus: 'All',
+    searchType: 'All',
+    sort: 'Latest',
+    sortOptions: ['Latest', 'Oldest', 'A-Z', 'Z-A']
 }
 
 const AppContext = createContext();
 
 const AppProvider = ({ children }) => {
     const [state, dispatch] = useReducer(reducer, initialState)
-    // this will send the Auth with each request, even where auth is not required
-    // axios.defaults.headers['Authorization']=`Bearer ${state.token}`
 
     //Axios instance
     const authFetch = axios.create({
         baseURL: `${endPoint}`,
+        withCredentials: true
     })
 
-    authFetch.interceptors.request.use((config) => {
-        config.headers['Authorization'] = `Bearer ${state.token}`;
-        return config
-    }, (error) => { return Promise.reject(error) })
-
-    authFetch.interceptors.response.use((response) => {
-        return response
-    },
+    authFetch.interceptors.response.use(
+        (response) => {
+            return response
+        },
         (error) => {
             if (error.response.status === 401) {
                 logoutUser()
             }
             return Promise.reject(error);
-        })
+        }
+    )
 
     const displayAlert = () => {
         dispatch({ type: DISPLAY_ALERT })
@@ -110,30 +103,17 @@ const AppProvider = ({ children }) => {
         }, 3000);
     }
 
-    const addUserToLocalStorage = ({ user, token, location }) => {
-        localStorage.setItem('user', JSON.stringify(user));
-        localStorage.setItem('token', token);
-        localStorage.setItem('location', location)
-    }
-
-    const removeUserFromLocalStorage = () => {
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
-        localStorage.removeItem('location')
-    }
-
     const registerUser = async (currentUser) => {
         dispatch({ type: REGISTER_USER_BEGIN })
         try {
-            const res = await axios.post(`${endPoint}/auth/register`, currentUser)
-            const { user, token, location } = res.data;
+            const res = await authFetch.post('/auth/register', currentUser)
+            const { user, location } = res.data;
             dispatch({
                 type: REGISTER_USER_SUCCESS,
                 payload: {
-                    user, token, location
+                    user, location
                 }
             })
-            addUserToLocalStorage({ user, token, location })
         }
         catch (err) {
             dispatch({ type: REGISTER_USER_ERROR, payload: { msg: err.response.data } })
@@ -144,15 +124,14 @@ const AppProvider = ({ children }) => {
     const loginUser = async (currentUser) => {
         dispatch({ type: LOGIN_USER_BEGIN })
         try {
-            const res = await axios.post(`${endPoint}/auth/login`, currentUser, {withCredentials:true})
-            const { user, token, location } = res.data;
+            const res = await authFetch.post('/auth/login', currentUser)
+            const { user, location } = res.data;
             dispatch({
                 type: LOGIN_USER_SUCCESS,
                 payload: {
-                    user, token, location
+                    user, location
                 }
             })
-            addUserToLocalStorage({ user, token, location })
         }
         catch (err) {
             dispatch({ type: LOGIN_USER_ERROR, payload: { msg: err.response.data.msg } })
@@ -164,14 +143,6 @@ const AppProvider = ({ children }) => {
     const updateUser = async (currentUser) => {
         dispatch({ type: UPDATE_USER_BEGIN })
         try {
-
-            // Here the auth is manual,
-            // let { data } = await axios.patch(`${endPoint}/auth/updateUser`, currentUser, {
-            //     headers:{
-            //         Authorization:`Bearer ${state.token}`
-            //     }
-            // })
-
             const { data } = await authFetch.patch('/auth/updateUser', currentUser)
             const { user, location, token } = data;
             dispatch({ type: UPDATE_USER_SUCCESS, payload: { user, location, token } })
@@ -221,9 +192,9 @@ const AppProvider = ({ children }) => {
         clearAlert();
     }
     const getJobs = async () => {
-        const {search,searchStatus,searchType,sort,page}=state;
-        let url=`/jobs?status=${searchStatus}&jobType=${searchType}&sort=${sort}&page=${page}`
-        if(search) url=url+`&search=${search}`
+        const { search, searchStatus, searchType, sort, page } = state;
+        let url = `/jobs?status=${searchStatus}&jobType=${searchType}&sort=${sort}&page=${page}`
+        if (search) url = url + `&search=${search}`
         dispatch({ type: GET_JOB_BEGIN })
         try {
             const { data } = await authFetch.get(url)
@@ -239,18 +210,13 @@ const AppProvider = ({ children }) => {
         }
         catch (error) {
             logoutUser()
-
-            dispatch({
-                type: GET_JOB_ERROR,
-                payload: { msg: error.response.data.msg }
-            })
         }
         clearAlert()
     }
-    const changePage=(page)=>{
+    const changePage = (page) => {
         dispatch({
-            type:CHANGE_PAGE,
-            payload:{page}
+            type: CHANGE_PAGE,
+            payload: { page }
         })
     }
     const setEditJob = (id) => {
@@ -304,7 +270,7 @@ const AppProvider = ({ children }) => {
             getJobs()
         }
         catch (error) {
-            if(error.response.status===401) return;
+            if (error.response.status === 401) return;
             dispatch({
                 type: DELETE_JOB_ERROR,
                 payload: { msg: error.response.data.msg }
@@ -313,26 +279,26 @@ const AppProvider = ({ children }) => {
         clearAlert()
     }
 
-    const showStats=async ()=>{
+    const showStats = async () => {
         dispatch({
-            type:SHOW_STATS_BEGIN
+            type: SHOW_STATS_BEGIN
         })
-        try{
-            let {data}=await authFetch('/jobs/stats')
+        try {
+            let { data } = await authFetch('/jobs/stats')
             dispatch({
-                type:SHOW_STATS_SUCCESS,
-                payload:{
-                    defaultStats:data.defaultStats,
-                    monthlyApplications:data.monthlyApplications
+                type: SHOW_STATS_SUCCESS,
+                payload: {
+                    defaultStats: data.defaultStats,
+                    monthlyApplications: data.monthlyApplications
                 }
             })
         }
-        catch(error){
+        catch (error) {
             logoutUser()
         }
     }
-    const clearFilters=()=>{
-        dispatch({type:CLEAR_FILTERS})
+    const clearFilters = () => {
+        dispatch({ type: CLEAR_FILTERS })
     }
     const handleChange = ({ name, value }) => {
         dispatch({
@@ -350,17 +316,36 @@ const AppProvider = ({ children }) => {
     const toggleSidebar = () => {
         dispatch({ type: TOGGLE_SIDEBAR })
     }
-    const logoutUser = () => {
+    const logoutUser = async () => {
+        await authFetch.get('/auth/logout')
         dispatch({ type: LOGOUT_USER })
-        removeUserFromLocalStorage()
     }
-    return <AppContext.Provider value={{ ...state, displayAlert, clearAlert, registerUser, loginUser, toggleSidebar, logoutUser, handleChange, updateUser, clearValues, createJob, getJobs, setEditJob, editJob, deleteJob,showStats, clearFilters, changePage }}>
+    const getCurrentUser=async ()=>{
+        dispatch({
+            type:GET_CURRENT_USER_BEGIN
+        })
+        try{
+        const {data}=await authFetch('/auth/getCurrentUser')
+        const {user,location}=data;
+        dispatch({
+            type:GET_CURRENT_USER_SUCCESS,
+            payload:{
+                user,location
+            }
+        })}
+        catch(error){
+            if(error.response.status===401) return;
+            logoutUser()
+        }
+    }
+
+    useEffect(()=>{
+        getCurrentUser();
+    },[])
+    return <AppContext.Provider value={{ ...state, displayAlert, clearAlert, registerUser, loginUser, toggleSidebar, logoutUser, handleChange, updateUser, clearValues, createJob, getJobs, setEditJob, editJob, deleteJob, showStats, clearFilters, changePage }}>
         {children}
     </AppContext.Provider>
 }
-
-//creating a use custom hook
-
 const useAppContext = () => {
     return useContext(AppContext)
 }

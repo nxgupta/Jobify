@@ -15,7 +15,6 @@ const Register = () => {
     const navigate = useNavigate()
     let { user, showAlert, isLoading, displayAlert, clearAlert, registerUser,loginUser } = useAppContext();
 
-    //toggle member
     const toggleMember = () => {
         setValues({ ...initialState, isMember: !values.isMember })
         return clearAlert();
