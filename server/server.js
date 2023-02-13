@@ -21,7 +21,7 @@ if(process.env.NODE_ENV!=='production'){
 }
 const port=process.env.PORT || 5000;
 app.use(cors({
-    origin:'http://localhost:5173',
+    origin:['https://trackapplications.netlify.app','https://trackapplications.netlify.app/'],
     credentials:true,
 }));
 app.use(helmet());
