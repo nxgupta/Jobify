@@ -76,8 +76,7 @@ const AppProvider = ({ children }) => {
 
     //Axios instance
     const authFetch = axios.create({
-        baseURL: `${endPoint}`,
-        withCredentials: true
+        baseURL: `${endPoint}`
     })
 
     authFetch.interceptors.response.use(
