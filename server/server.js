@@ -22,7 +22,7 @@ if(process.env.NODE_ENV!=='production'){
 //cors
 import cors from 'cors'
 app.use(cors({
-    origin: [`http://localhost:5173`,`http://localhost:5174`, `https://63e9c61fa25c0f12872a7377--trackapplications.netlify.app/`,`https://trackapplications.netlify.app/`],
+    origin: ['http://localhost:5173','http://localhost:5174', 'https://63e9c61fa25c0f12872a7377--trackapplications.netlify.app','https://trackapplications.netlify.app'],
     credentials: true,
   }))
 
