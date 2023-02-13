@@ -1,47 +1,32 @@
 import helmet from 'helmet'
 import xss from 'xss-clean'
 import mongoSanitize from 'express-mongo-sanitize'
-import rateLimit from 'express-rate-limit'//express
+import rateLimit from 'express-rate-limit'
 import express from 'express'
 import cookieParser from 'cookie-parser'
-const app=express()
-
-//dotenv
-import dotenv from 'dotenv'
-dotenv.config()
-
-//cookie-parser
-
-//morgon
+import bodyParser from "body-parser";
 import morgan from 'morgan'
+import dotenv from 'dotenv'
+import cors from 'cors'
+import authRouter from './routes/authRoutes.js'
+import jobsRouter from './routes/jobsRoutes.js'
+import { connectDB } from './database/connect.js';
+import {notFoundMiddleware,errorHandlerMiddleware} from './middleware/index.js';
+import authenticateUser from './middleware/Auth.js'
+
+dotenv.config()
+const app=express()
 if(process.env.NODE_ENV!=='production'){
     app.use(morgan('dev'))
 }
-
-//cors
-import cors from 'cors'
-app.use(cors({
-    origin: ['http://localhost:5174','https://trackapplications.netlify.app'],
-    credentials: true,
-  }))
-
-//routes
-import authRouter from './routes/authRoutes.js'
-import jobsRouter from './routes/jobsRoutes.js'
-
-//connecting to db
-import { connectDB } from './database/connect.js';
-
-// middleWares
-import {notFoundMiddleware,errorHandlerMiddleware} from './middleware/index.js';
-
-//configuring port
 const port=process.env.PORT || 5000;
-
-//body in json
+app.use(cors());
+app.use(helmet());
+app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json())
 app.use(cookieParser())
-app.use(helmet())
 app.use(xss())
 app.use(mongoSanitize())
 const limiter = rateLimit({
@@ -51,11 +36,6 @@ const limiter = rateLimit({
 
 })
 app.use(limiter)
-
-
-//in order to authenticate user, for jobs
-import authenticateUser from './middleware/Auth.js'
-
 app.use('/api/v1/auth',authRouter)
 app.use('/api/v1/jobs',authenticateUser, jobsRouter)
 

@@ -6,6 +6,6 @@ const attachCookies = ({res,token}) => {
         sameSite: 'none',
         expires: new Date(Date.now() + oneDay),
     })
-      
+     
 }
 export default attachCookies
