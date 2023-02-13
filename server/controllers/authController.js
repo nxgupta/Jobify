@@ -82,8 +82,6 @@ const getCurrentUser= catchAsync(async (req,res)=>{
 
 const logOut=(req,res)=>{
     res.cookie('token','logout',{
-        // secure: true,
-        // sameSite: 'none',
         httpOnly:true,
         expires:new Date(Date.now()+1000),
     })

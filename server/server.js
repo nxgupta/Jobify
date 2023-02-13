@@ -11,7 +11,6 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 //cookie-parser
-app.use(cookieParser())
 
 //morgon
 import morgan from 'morgan'
@@ -41,6 +40,7 @@ const port=process.env.PORT || 5000;
 
 //body in json
 app.use(express.json())
+app.use(cookieParser())
 app.use(helmet())
 app.use(xss())
 app.use(mongoSanitize())
