@@ -66,8 +66,6 @@ app.use('/api/v1/jobs',authenticateUser, jobsRouter)
 //handling route errors
 app.use(notFoundMiddleware)
 
-//handling errors caused by the missing resources/server error
-app.use(errorHandlerMiddleware)
 let start=async ()=>{
     try{
         await connectDB(process.env.MONGO_URL)
@@ -79,4 +77,6 @@ let start=async ()=>{
         console.log('Failed to connect to db, Error: ',err)
     }
 }
+//handling errors caused by the missing resources/server error
+app.use(errorHandlerMiddleware)
 start()
