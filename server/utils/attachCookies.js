@@ -4,7 +4,7 @@ const attachCookies = ({res,token}) => {
         httpOnly: true,
         expires: new Date(Date.now() + oneDay),
         secure: process.env.NODE_ENV === 'production',
-        SameSite:"None"
+        sameSite:"None"
     })
     
 }
