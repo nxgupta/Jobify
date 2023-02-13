@@ -88,7 +88,7 @@ const AppProvider = ({ children }) => {
             if (error.response.status === 401) {
                 logoutUser()
             }
-            return Promise.reject(error);
+                return Promise.reject(error);
         }
     )
 
@@ -144,9 +144,8 @@ const AppProvider = ({ children }) => {
         dispatch({ type: UPDATE_USER_BEGIN })
         try {
             const { data } = await authFetch.patch('/auth/updateUser', currentUser)
-            const { user, location, token } = data;
-            dispatch({ type: UPDATE_USER_SUCCESS, payload: { user, location, token } })
-            addUserToLocalStorage({ user, location, token });
+            const { user, location } = data;
+            dispatch({ type: UPDATE_USER_SUCCESS, payload: { user, location } })
 
         }
         catch (error) {
@@ -334,7 +333,7 @@ const AppProvider = ({ children }) => {
             }
         })}
         catch(error){
-            if(error.response.status===401) return;
+            if(error?.response?.status===401) return;
             logoutUser()
         }
     }

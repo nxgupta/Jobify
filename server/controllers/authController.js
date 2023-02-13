@@ -27,7 +27,7 @@ const register = async (req, res, next) => {
         next(err)
     }
 }
-const login = async (req, res,next) => {
+const login = async (req, res, next) => {
     try{
     const {email,password}=req.body;
     if(!email || !password){
@@ -80,14 +80,14 @@ const getCurrentUser= catchAsync(async (req,res)=>{
      res.status(StatusCodes.OK).json({user, location: user.location})
 })
 
-const logOut=catchAsync((req,res)=>{
+const logOut=(req,res)=>{
     res.cookie('token','logout',{
-        secure: true,
-        sameSite: 'none',
+        // secure: true,
+        // sameSite: 'none',
         httpOnly:true,
         expires:new Date(Date.now()+1000),
     })
     res.status(StatusCodes.OK).json({msg: 'user logged out'})
-})
+}
 
 export { register, login, updateUser, getCurrentUser, logOut }
