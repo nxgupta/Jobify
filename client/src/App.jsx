@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Landing, Error, Register, ProtectedRoute } from './pages'
 import { Addjob, Alljobs, Profile, SharedLayout, Stats } from './pages/dashboard'
 
-export const endPoint = 'https://trackmyapplications.onrender.com'
+export const endPoint = 'https://trackmyapplications.onrender.com/api/v1'
 function App() {
   return (
     <BrowserRouter>
