@@ -76,7 +76,8 @@ const AppProvider = ({ children }) => {
 
     //Axios instance
     const authFetch = axios.create({
-        baseURL: `${endPoint}`
+        baseURL: `${endPoint}`,
+        withCredentials:true
     })
 
     authFetch.interceptors.response.use(
@@ -87,7 +88,7 @@ const AppProvider = ({ children }) => {
             if (error.response.status === 401) {
                 logoutUser()
             }
-                return Promise.reject(error);
+            return Promise.reject(error);
         }
     )
 
@@ -148,7 +149,7 @@ const AppProvider = ({ children }) => {
 
         }
         catch (error) {
-            if (error.response.data.status !== 401)
+            if (error.response.status !== 401)
                 dispatch({ type: UPDATE_USER_ERROR, payload: { msg: error.response.data.msg } })
         }
         clearAlert()
@@ -180,6 +181,7 @@ const AppProvider = ({ children }) => {
             })
         }
         catch (error) {
+            if (error.response.status === 401) return;
             dispatch({
                 type: CREATE_JOB_ERROR,
                 payload: {

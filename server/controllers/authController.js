@@ -21,13 +21,13 @@ const register = async (req, res, next) => {
 
         const token=user.createJWT()
         attachCookies({res,token})
-        res.status(StatusCodes.CREATED).json({user:{name:user.name,email:user.email,lastName:user.lastName,location:user.location},token,location:user.location})
+        res.status(StatusCodes.CREATED).json({user:{name:user.name,email:user.email,lastName:user.lastName,location:user.location},location:user.location})
     }
     catch (err) {
         next(err)
     }
 }
-const login = async (req, res, next) => {
+const login = async (req, res,next) => {
     try{
     const {email,password}=req.body;
     if(!email || !password){
@@ -36,18 +36,18 @@ const login = async (req, res, next) => {
     //we need to exclusively include select for password
     const user=await User.findOne({email}).select('+password')
 
-    if(!user) {throw new unAuthenticatedError('Invalid credentials')}
+    if(!user) {throw new badRequestError('Invalid credentials')}
 
     const isPasswordCorrect = await user.comparePassword(password)
 
     if(!isPasswordCorrect){
-        throw new unAuthenticatedError('Invalid Credentials')
+        throw new badRequestError('Invalid Credentials')
     }
 
     const token=user.createJWT();
     user.password=undefined
     attachCookies({res,token})
-    res.status(StatusCodes.OK).json({user, token, location:user.location})
+    res.status(StatusCodes.OK).json({user, location:user.location})
 }
 catch(err){
     next(err)
@@ -80,12 +80,12 @@ const getCurrentUser= catchAsync(async (req,res)=>{
      res.status(StatusCodes.OK).json({user, location: user.location})
 })
 
-const logOut=(req,res)=>{
+const logOut=async (req,res)=>{
     res.cookie('token','logout',{
-        //secure: true,
+        secure: true,
         httpOnly: true,
-        //sameSite: 'none',
-        expires:new Date(Date.now()+1000),
+        sameSite: 'none',
+        expires: new Date(Date.now()+1000),
     })
     res.status(StatusCodes.OK).json({msg: 'user logged out'})
 }

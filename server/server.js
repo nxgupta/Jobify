@@ -20,7 +20,10 @@ if(process.env.NODE_ENV!=='production'){
     app.use(morgan('dev'))
 }
 const port=process.env.PORT || 5000;
-app.use(cors());
+app.use(cors({
+    origin:'http://localhost:5173',
+    credentials:true,
+}));
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(bodyParser.json());
@@ -38,6 +41,7 @@ const limiter = rateLimit({
 app.use(limiter)
 app.use('/api/v1/auth',authRouter)
 app.use('/api/v1/jobs',authenticateUser, jobsRouter)
+app.set('trust proxy', 1)
 
 //handling route errors
 app.use(notFoundMiddleware)

@@ -62,7 +62,7 @@ const Register = () => {
                 {values.isMember ? null : <FormRow type='text' name='name' value={values.name} handleChange={handleChange} />}
 
                 {/* email */}
-                <FormRow type='text' name='email' value={values.email} handleChange={handleChange} />
+                <FormRow type='email' name='email' value={values.email} handleChange={handleChange} />
 
                 {/* password */}
                 <FormRow type='password' name='password' value={values.password} handleChange={handleChange} />
