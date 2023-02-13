@@ -22,7 +22,7 @@ if(process.env.NODE_ENV!=='production'){
 //cors
 import cors from 'cors'
 app.use(cors({
-    origin: ['http://localhost:5173','http://localhost:5174', 'https://63e9c61fa25c0f12872a7377--trackapplications.netlify.app','https://trackapplications.netlify.app'],
+    origin: true,
     credentials: true,
   }))
 
@@ -52,10 +52,6 @@ const limiter = rateLimit({
 })
 app.use(limiter)
 
-//setting home route
-app.get('/',(req,res)=>{
-    res.send('welcome!')
-})
 
 //in order to authenticate user, for jobs
 import authenticateUser from './middleware/Auth.js'
@@ -65,6 +61,8 @@ app.use('/api/v1/jobs',authenticateUser, jobsRouter)
 
 //handling route errors
 app.use(notFoundMiddleware)
+//handling errors caused by the missing resources/server error
+app.use(errorHandlerMiddleware)
 
 let start=async ()=>{
     try{
@@ -77,6 +75,4 @@ let start=async ()=>{
         console.log('Failed to connect to db, Error: ',err)
     }
 }
-//handling errors caused by the missing resources/server error
-app.use(errorHandlerMiddleware)
 start()
