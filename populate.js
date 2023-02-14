@@ -1,8 +1,8 @@
 import dotenv from 'dotenv'
 import {readFile} from 'fs/promises'
 import mongoose from 'mongoose'
-import {connectDB} from './database/connect.js'
-import Job from './model/Job.js'
+import {connectDB} from './server/database/connect.js'
+import Job from './server/model/Job.js'
 
 dotenv.config()
 
