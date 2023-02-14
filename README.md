@@ -4,7 +4,6 @@
 
 Project in Action - [Jobify](https://jobify-7qh9.onrender.com)
 
-Extensive documentation with examples [here](https://documenter.getpostman.com/view/20805847/2s8YsxuB4B)
 
 ## Features
 
@@ -51,7 +50,6 @@ npm run install-dependencies
 ### Run
 
 ```
-# Run frontend (:3000) & backend (:5000) both using concurrently
 npm start
 # Run backend only
 npm run server
@@ -62,17 +60,6 @@ npm run server
 ```
 # Create frontend prod build
 npm run build-client
-```
-
-### Seed Database
-
-You can use the following commands to seed the database with some sample jobs as well as destroy all the jobs
-
-```
-# Import data
-npm run i
-# Destroy data
-npm run d
 ```
 
 ```
