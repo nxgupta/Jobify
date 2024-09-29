@@ -1,10 +1,7 @@
-import logo from "../assets/images/logo.svg"
-let Logo = () => {
-  return (
-    <nav>
-      <img src={logo} alt="jobify logo" className="logo" />
-    </nav>
-  )
-}
+import logo from '../assets/images/logo.svg';
 
-export default Logo
+const Logo = () => {
+  return <img src={logo} alt='jobify' className='logo' />;
+};
+
+export default Logo;

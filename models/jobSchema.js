@@ -2,7 +2,7 @@ import mongoose from "mongoose"
 import {JOB_STATUS, JOB_TYPE} from "../utils/contants.js"
 let jobSchema = new mongoose.Schema(
   {
-    job: {type: String},
+    company: {type: String},
     position: {type: String},
     jobStatus: {type: String, enum: Object.values(JOB_STATUS), default: JOB_STATUS.PENDING},
     jobType: {
